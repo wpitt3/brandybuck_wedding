@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
-import { PALETTES, FONT_PAIRINGS, buildTheme } from './theme';
+import { PALETTES, FONT_PAIRINGS, buildTheme, DEFAULT_TWEAKS } from './theme';
 
-const COUPLE = { bride: 'Sarah', groom: 'James' };
-const WEDDING_DATE = new Date('2026-09-12T14:00:00');
+const COUPLE = { bride: 'Helen', groom: 'William' };
+const WEDDING_DATE = new Date('2026-09-26T15:30:00');
 
 // ─── Hooks ────────────────────────────────────────────────────
 function useCountdown(target) {
@@ -48,22 +48,6 @@ function Section({ children, className = '' }) {
   );
 }
 
-// ─── SVGs ─────────────────────────────────────────────────────
-const WheelDeco = ({ size = 80, className = '' }) => (
-  <svg className={className} width={size} height={size} viewBox="0 0 80 80" fill="none">
-    <circle cx="40" cy="40" r="36" stroke="currentColor" strokeWidth="1.5"/>
-    <circle cx="40" cy="40" r="5"  stroke="currentColor" strokeWidth="2"/>
-    {Array.from({length:12},(_,i) => {
-      const a = (i*30)*Math.PI/180;
-      return <line key={i}
-        x1={40+5*Math.cos(a)} y1={40+5*Math.sin(a)}
-        x2={40+36*Math.cos(a)} y2={40+36*Math.sin(a)}
-        stroke="currentColor" strokeWidth="0.8" opacity="0.7"/>;
-    })}
-    <circle cx="40" cy="40" r="20" stroke="currentColor" strokeWidth="0.5" opacity="0.3" strokeDasharray="3 4"/>
-  </svg>
-);
-
 const ContourBg = () => (
   <svg className="contour-bg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
     {[80,130,180,230,280].map((r,i) => (
@@ -95,25 +79,6 @@ const RiverDivider = ({ flip = false }) => (
   </div>
 );
 
-// Sprig for nature sections
-const Sprig = ({ className = '' }) => (
-  <svg className={className} viewBox="0 0 120 200" fill="none">
-    <path d="M60 195 Q60 100 60 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-    <path d="M60 150 Q35 130 20 110" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-    <ellipse cx="14" cy="106" rx="12" ry="8" transform="rotate(-30 14 106)" fill="currentColor" opacity="0.5"/>
-    <path d="M60 130 Q85 110 100 90" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-    <ellipse cx="106" cy="86" rx="12" ry="8" transform="rotate(30 106 86)" fill="currentColor" opacity="0.5"/>
-    <path d="M60 105 Q38 88 26 68" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-    <ellipse cx="21" cy="64" rx="11" ry="7" transform="rotate(-40 21 64)" fill="currentColor" opacity="0.4"/>
-    <path d="M60 88 Q82 70 94 50" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-    <ellipse cx="99" cy="46" rx="11" ry="7" transform="rotate(40 99 46)" fill="currentColor" opacity="0.4"/>
-    <path d="M60 62 Q48 46 44 28" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-    <ellipse cx="42" cy="23" rx="9" ry="6" transform="rotate(-20 42 23)" fill="currentColor" opacity="0.35"/>
-    <path d="M60 52 Q72 36 76 18" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
-    <ellipse cx="78" cy="13" rx="9" ry="6" transform="rotate(20 78 13)" fill="currentColor" opacity="0.35"/>
-  </svg>
-);
-
 // ─── Data ─────────────────────────────────────────────────────
 const SCHEDULE = [
   { time: '2:00 PM', label: 'Guests Arrive',          note: 'Welcome drinks on the riverside terrace', km: '0.0' },
@@ -131,7 +96,45 @@ const DIETARY_OPTIONS = [
 ];
 
 // ─── Theme Editor Panel ───────────────────────────────────────
-function ThemeEditor({ palette, fontPairing, onPalette, onFont, onClose }) {
+function ThemeEditor({ palette, fontPairing, tweaks, onPalette, onFont, onTweak, onClose }) {
+  // Compute resolved colours for the "Current Theme" preview
+  let [primary, accent, background, surface] = palette.colors;
+  if (tweaks.swapPrimaryAccent) { [primary, accent] = [accent, primary]; }
+  if (tweaks.swapBackground)    { [primary, background] = [background, primary]; }
+  const resolvedSurface = tweaks.invertSurface    ? background : surface;
+  const resolvedBg      = tweaks.invertBackground ? surface    : background;
+
+  const TOGGLE_DEFS = [
+    {
+      key:   'swapPrimaryAccent',
+      label: 'Swap Primary & Accent',
+      desc:  'Exchange hero/footer colour with button/highlight colour',
+      before: [palette.colors[0]],
+      after:  [palette.colors[1]],
+    },
+    {
+      key:   'swapBackground',
+      label: 'Swap Background',
+      desc:  'Swap page background with surface',
+      before: [palette.colors[3]],
+      after:  [palette.colors[2]],
+    },
+    {
+      key:   'invertBackground',
+      label: 'Toggle Background',
+      desc:  'Use the surface colour as the page background',
+      before: [palette.colors[2]],
+      after:  [],
+    },
+    {
+      key:   'invertSurface',
+      label: 'Toggle Surface',
+      desc:  'Turn off using surface',
+      before: [palette.colors[3]],
+      after:  [],
+    }
+  ];
+
   return (
     <div className="editor-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="editor-panel">
@@ -146,7 +149,47 @@ function ThemeEditor({ palette, fontPairing, onPalette, onFont, onClose }) {
         </div>
 
         <div className="editor-body">
-          {/* Palette section */}
+
+          {/* ── Colour Tweaks ── */}
+          <div className="editor-section">
+            <h3 className="editor-section-label">Colour Tweaks</h3>
+            <div className="tweak-list">
+              {TOGGLE_DEFS.map(t => (
+                <div key={t.key} className={`tweak-row ${tweaks[t.key] ? 'on' : ''}`}>
+                  <div className="tweak-info">
+                    <div className="tweak-chips">
+                      {t.before.map((c, i) => (
+                        <React.Fragment key={i}>
+                          <div className="tweak-chip" style={{ background: c }} />
+                          {i < t.before.length - 1 && <span className="tweak-arrow">→</span>}
+                        </React.Fragment>
+                      ))}
+                      <span className="tweak-arrow tweak-arrow-main">⇄</span>
+                      {t.after.map((c, i) => (
+                        <React.Fragment key={i}>
+                          <div className="tweak-chip" style={{ background: c }} />
+                          {i < t.after.length - 1 && <span className="tweak-arrow">→</span>}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                    <div className="tweak-text">
+                      <span className="tweak-label">{t.label}</span>
+                      <span className="tweak-desc">{t.desc}</span>
+                    </div>
+                  </div>
+                  <button
+                    className={`tweak-toggle ${tweaks[t.key] ? 'on' : ''}`}
+                    onClick={() => onTweak(t.key, !tweaks[t.key])}
+                    aria-pressed={tweaks[t.key]}
+                  >
+                    <span className="tweak-thumb" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Palette ── */}
           <div className="editor-section">
             <h3 className="editor-section-label">Colour Palette</h3>
             <div className="palette-grid">
@@ -169,7 +212,7 @@ function ThemeEditor({ palette, fontPairing, onPalette, onFont, onClose }) {
             </div>
           </div>
 
-          {/* Font section */}
+          {/* ── Fonts ── */}
           <div className="editor-section">
             <h3 className="editor-section-label">Font Pairing</h3>
             <div className="font-list">
@@ -194,26 +237,27 @@ function ThemeEditor({ palette, fontPairing, onPalette, onFont, onClose }) {
             </div>
           </div>
 
-          {/* Live colour swatches */}
+          {/* ── Current resolved theme ── */}
           <div className="editor-section">
             <h3 className="editor-section-label">Current Theme</h3>
             <div className="current-swatches">
               {[
-                { label: 'Primary', key: '--primary' },
-                { label: 'Accent',  key: '--accent' },
-                { label: 'Paper',   key: '--bg' },
-                { label: 'Surface', key: '--surface' },
-              ].map(({ label, key }, i) => (
-                <div key={key} className="current-swatch">
-                  <div className="cur-chip" style={{ background: palette.colors[i] }} />
+                { label: 'Primary', color: primary },
+                { label: 'Accent',  color: accent },
+                { label: 'Paper',   color: resolvedBg },
+                { label: 'Surface', color: resolvedSurface },
+              ].map(({ label, color }) => (
+                <div key={label} className="current-swatch">
+                  <div className="cur-chip" style={{ background: color }} />
                   <div>
                     <span className="cur-label">{label}</span>
-                    <span className="cur-hex">{palette.colors[i]}</span>
+                    <span className="cur-hex">{color}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -235,6 +279,7 @@ function loadGoogleFont(googleFonts) {
 export default function App() {
   const [palette,     setPalette]     = useState(PALETTES[0]);
   const [fontPairing, setFontPairing] = useState(FONT_PAIRINGS[0]);
+  const [tweaks,      setTweaks]      = useState(DEFAULT_TWEAKS);
   const [editorOpen,  setEditorOpen]  = useState(false);
   const [form,        setForm]        = useState({ name:'', guests:'1', dietary:'', other:'', attending:null, message:'' });
   const [submitted,   setSubmitted]   = useState(false);
@@ -244,9 +289,11 @@ export default function App() {
 
   // Apply theme to :root
   useEffect(() => {
-    const vars = buildTheme(palette, fontPairing);
+    const vars = buildTheme(palette, fontPairing, tweaks);
     Object.entries(vars).forEach(([k,v]) => document.documentElement.style.setProperty(k, v));
-  }, [palette, fontPairing]);
+  }, [palette, fontPairing, tweaks]);
+
+  const handleTweak = (key, val) => setTweaks(t => ({ ...t, [key]: val }));
 
   // Pre-load all fonts
   useEffect(() => {
@@ -268,8 +315,7 @@ export default function App() {
       {/* ── Nav ── */}
       <nav className={`nav ${scrolled ? 'scrolled' : ''}`}>
         <span className="nav-brand" onClick={() => scrollTo('home')}>
-          {/*<WheelDeco size={20} className="nav-wheel" />*/}
-          S &amp; J
+          H &amp; W
         </span>
         <div className={`nav-links ${navOpen ? 'open' : ''}`}>
           {['details','schedule','rsvp'].map(id => (
@@ -296,14 +342,12 @@ export default function App() {
       <div id="home" className="hero">
         <ContourBg />
         <div className="hero-grid" />
-        {/*<WheelDeco size={340} className="hero-wheel-bg hero-wheel-l" />*/}
-        {/*<WheelDeco size={230} className="hero-wheel-bg hero-wheel-r" />*/}
 
         <div className="hero-content">
           <div className="hero-tag">
             <span className="tag-city">Bristol</span>
             <span className="tag-sep">·</span>
-            <span>Avon Valley</span>
+            <span>UK</span>
           </div>
 
           <h1 className="hero-names">
@@ -317,9 +361,8 @@ export default function App() {
 
           <div className="hero-meta">
             {[
-              { label: 'DATE',     val: '12 September 2026' },
-              { label: 'LOCATION', val: 'Bristol, UK' },
-              { label: 'DISTANCE', val: '12 km of joy' },
+              { label: 'DATE',     val: '26 September 2026' },
+              { label: 'LOCATION', val: 'Mud Dock Cafe' },
             ].map((m,i) => [
               <div key={m.label} className="meta-item">
                 <span className="meta-label">{m.label}</span>
@@ -348,11 +391,10 @@ export default function App() {
             <path d="M0,55 L30,50 L80,38 L140,28 L200,22 L260,30 L320,18 L380,25 L430,32 L480,24 L540,15 L600,20"
               stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.35"/>
           </svg>
-          <span className="elev-label">Elevation — Avon Gorge to City Centre</span>
         </div>
       </div>
 
-      <RiverDivider />
+      <RiverDivider flip />
 
       {/* ── DETAILS (Bristol route strip) ── */}
       <div id="details" className="details-wrapper">
@@ -364,24 +406,24 @@ export default function App() {
             {[
               {
                 pin: 'A', head: 'Date & Time',
-                body: <>Saturday, <strong>12 September 2026</strong> — doors open at <strong>2:00 PM</strong></>,
-                note: 'Ceremony begins promptly at 2:30 PM',
+                body: <>Saturday, <strong>26 September 2026</strong> — doors open at <strong>3:30 PM</strong><br></br> Ceremony begins at <strong>4:00 PM</strong></> ,
+                note: '',
               },
               {
                 pin: 'B', head: 'Location',
-                body: <>The Watershed, 1 Canons Rd, <strong>Bristol BS1 5TX</strong></>,
-                note: 'Perched on Bristol Harbourside with views across the Floating Harbour',
+                body: <>Mud Dock Cafe, 40 The Grove, <strong>Bristol BS1 4RB</strong></>,
+                note: 'On the harbourside beside Thekla and Queen Square',
                 link: { href: 'https://maps.google.com/?q=Watershed+Bristol', text: 'Open in Maps →' },
               },
               {
                 pin: 'C', head: 'Dress Code',
-                body: <><em>Smart casual — cycling chic meets riverside picnic</em></>,
-                note: 'Bright colours encouraged. Comfortable shoes advised — cobbles ahead. Please avoid white.',
+                body: <>Smart casual — just don't wear jeans, sportswear or running shoes</>,
+                note: 'Joyful outfits and colours encouraged. Please avoid white.',
               },
               {
                 pin: 'D', head: 'Getting There',
-                body: <>15 min walk from <strong>Bristol Temple Meads</strong>, or arrive by bike or Harbour Ferry</>,
-                note: 'Cycle parking on-site. Car park: Trenchard St NCP. Taxis from Temple Meads run frequently.',
+                body: <>15 min walk from Bristol Temple Meads. Buses, bikes, car and even ferry options</>,
+                note: 'Bike and Car parking next door.',
               },
             ].map(row => (
               <div key={row.pin} className="detail-row">
@@ -400,7 +442,7 @@ export default function App() {
         </Section>
       </div>
 
-      <RiverDivider flip />
+      <RiverDivider />
 
       {/* ── SCHEDULE (Nature/botanical) ── */}
       <div id="schedule" className="schedule-wrapper">
@@ -413,7 +455,8 @@ export default function App() {
             {SCHEDULE.map((item, i) => (
               <div key={i} className="tl-item">
                 <div className="tl-km">
-
+                  {/*<span>km</span>*/}
+                  {/*<strong>{item.km}</strong>*/}
                 </div>
                 <div className="tl-spine">
                   <div className="tl-pip" />
@@ -432,7 +475,7 @@ export default function App() {
         </Section>
       </div>
 
-      <RiverDivider />
+      <RiverDivider flip />
 
       {/* ── RSVP (Nature) ── */}
       <div id="rsvp" className="rsvp-wrapper">
@@ -501,14 +544,10 @@ export default function App() {
         </Section>
       </div>
 
+      <RiverDivider />
+
       {/* ── Footer (Nature) ── */}
       <footer className="footer">
-        <div className="footer-river">
-          <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-            <path d="M0,40 C180,15 360,65 540,40 C720,15 900,65 1080,40 C1260,15 1380,55 1440,40 L1440,80 L0,80 Z"
-              fill="currentColor" opacity="0.08"/>
-          </svg>
-        </div>
         {/*<Sprig className="footer-sprig footer-sprig-l" />*/}
         <div className="footer-inner">
           {/*<WheelDeco size={44} className="footer-wheel" />*/}
@@ -519,13 +558,23 @@ export default function App() {
         {/*<Sprig className="footer-sprig footer-sprig-r" />*/}
       </footer>
 
+      {/* ── Floating Style Button (always visible) ── */}
+      <button className="fab" onClick={() => setEditorOpen(true)} aria-label="Open style editor">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+
       {/* ── Editor ── */}
       {editorOpen && (
         <ThemeEditor
           palette={palette}
           fontPairing={fontPairing}
+          tweaks={tweaks}
           onPalette={p => setPalette(p)}
           onFont={f => setFontPairing(f)}
+          onTweak={handleTweak}
           onClose={() => setEditorOpen(false)}
         />
       )}

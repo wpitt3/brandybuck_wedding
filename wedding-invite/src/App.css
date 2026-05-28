@@ -47,7 +47,7 @@ body {
   transition: background 0.4s, border-color 0.4s;
 }
 .nav.scrolled {
-  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  background: var(--surface);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
@@ -242,7 +242,7 @@ body {
 .eyebrow {
   font-family: var(--font-body); font-size: 0.62rem; font-weight: 500;
   letter-spacing: 0.25em; text-transform: uppercase;
-  color: var(--accent); text-align: center; margin-bottom: 0.5rem;
+  color: var(--accent-dark); text-align: center; margin-bottom: 0.5rem;
   transition: color 0.5s, font-family 0.4s;
 }
 .eyebrow-light { color: color-mix(in srgb, var(--on-surface) 60%, transparent); }
@@ -301,7 +301,7 @@ body {
 .dr-link {
   display: inline-block; margin-top: 0.6rem;
   font-family: var(--font-body); font-size: 0.72rem; font-weight: 500;
-  color: var(--accent); text-decoration: none;
+  color: var(--accent-dark); text-decoration: none;
   border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
   transition: color 0.2s, border-color 0.2s;
 }
@@ -443,8 +443,8 @@ body {
 /* ── Editor overlay ── */
 .editor-overlay {
   position: fixed; inset: 0; z-index: 500;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(4px);
+  /*background: rgba(0,0,0,0.55);*/
+  /*backdrop-filter: blur(4px);*/
   display: flex; align-items: flex-end; justify-content: flex-end;
   animation: overlayIn 0.25s ease both;
 }
@@ -452,7 +452,7 @@ body {
 
 .editor-panel {
   width: 100%; max-width: 420px; height: 100dvh;
-  background: var(--bg);
+  background: white;
   display: flex; flex-direction: column;
   box-shadow: -8px 0 48px rgba(0,0,0,0.2);
   animation: slideIn 0.35s var(--ease) both;
@@ -558,6 +558,76 @@ body {
 .cur-chip { width: 28px; height: 28px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.08); flex-shrink: 0; }
 .cur-label { font-family: var(--font-body); font-size: 0.68rem; font-weight: 500; color: var(--primary-dark); display: block; }
 .cur-hex { font-family: monospace; font-size: 0.65rem; color: var(--primary-muted); }
+
+
+/* ── Colour Tweak Toggles ── */
+.tweak-list { display: flex; flex-direction: column; gap: 0; }
+
+.tweak-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.tweak-row:first-child { border-top: 1px solid var(--border); }
+.tweak-row:hover { background: color-mix(in srgb, var(--primary) 3%, transparent); margin: 0 -0.25rem; padding-left: 0.25rem; padding-right: 0.25rem; }
+
+.tweak-info { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 0; }
+
+.tweak-chips {
+  display: flex; align-items: center; gap: 5px;
+}
+.tweak-chip {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+.tweak-arrow {
+  font-size: 0.65rem;
+  color: var(--muted);
+  line-height: 1;
+}
+.tweak-arrow-main {
+  font-size: 0.75rem;
+  color: var(--accent);
+  margin: 0 2px;
+}
+
+.tweak-text { display: flex; flex-direction: column; gap: 1px; }
+.tweak-label {
+  font-family: var(--font-body); font-size: 0.75rem; font-weight: 600;
+  color: var(--primary); line-height: 1.2;
+}
+.tweak-desc {
+  font-family: var(--font-body); font-size: 0.65rem;
+  color: var(--muted); line-height: 1.4;
+}
+
+/* Toggle pill */
+.tweak-toggle {
+  position: relative; flex-shrink: 0;
+  width: 40px; height: 22px;
+  border-radius: 11px;
+  border: none; cursor: pointer; padding: 0;
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  border: 1.5px solid var(--border);
+  transition: background 0.3s, border-color 0.3s;
+}
+.tweak-toggle.on {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.tweak-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: block;
+}
+.tweak-toggle.on .tweak-thumb { transform: translateX(18px); }
+
 
 /* ── Responsive ── */
 @media (max-width: 680px) {

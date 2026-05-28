@@ -110,16 +110,39 @@ export const FONT_PAIRINGS = [
   },
 ];
 
-// Derive the full set of CSS vars from a palette + font pairing
-export function buildTheme(palette, fontPairing) {
+// ─── Tweaks defaults ─────────────────────────────────────────
+// swapPrimaryAccent : swap primary ↔ accent colours
+// swapBackground    : swap background ↔ primary (dark paper)
+// invertSurface     : use bg colour as surface instead of palette surface
+// invertBackground  : use surface colour as page background
+export const DEFAULT_TWEAKS = {
+  swapPrimaryAccent: false,
+  swapBackground:    false,
+  invertSurface:     false,
+  invertBackground:  false,
+};
+
+// Derive the full set of CSS vars from a palette + font pairing + tweaks
+export function buildTheme(palette, fontPairing, tweaks = DEFAULT_TWEAKS) {
   let [primary, accent, background, surface] = palette.colors;
 
-  return {
-    '--primary':   primary,
-    '--accent':    accent,
-    '--bg':        background,
-    '--surface':   surface,
+  if (tweaks.swapPrimaryAccent) { [primary, accent] = [accent, primary]; }
+  if (tweaks.swapBackground)    { [surface, background] = [background, surface]; }
+  let toReturn = {
+    '--primary':      primary,
+    '--accent':       accent,
+    '--bg':           '#F5F5F5',
+    '--surface':      '#1A2830',
     '--font-display': `'${fontPairing.display}', Georgia, serif`,
     '--font-body':    `'${fontPairing.body}', sans-serif`,
   };
+
+  if (tweaks.invertBackground)     {
+    toReturn['--bg'] = background;
+  }
+  if (tweaks.invertSurface)     {
+    toReturn['--surface'] = surface;
+  }
+
+  return toReturn;
 }
