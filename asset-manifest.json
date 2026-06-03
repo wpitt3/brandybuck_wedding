@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/wedding-invite/static/css/main.fa50f31b.css",
+    "main.js": "/wedding-invite/static/js/main.03a9ef56.js",
+    "index.html": "/wedding-invite/index.html",
+    "main.fa50f31b.css.map": "/wedding-invite/static/css/main.fa50f31b.css.map",
+    "main.03a9ef56.js.map": "/wedding-invite/static/js/main.03a9ef56.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fa50f31b.css",
+    "static/js/main.03a9ef56.js"
+  ]
+}
