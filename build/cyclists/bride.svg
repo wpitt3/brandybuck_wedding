@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 200" width="160" height="200">
+  <!-- Bike frame -->
+  <g stroke="#2D6A7A" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Wheels -->
+    <circle cx="40" cy="155" r="32" stroke="#2D6A7A" stroke-width="2"/>
+    <circle cx="120" cy="155" r="32" stroke="#2D6A7A" stroke-width="2"/>
+    <!-- Spokes bride wheel left -->
+    <line x1="40" y1="123" x2="40" y2="187"/>
+    <line x1="8" y1="155" x2="72" y2="155"/>
+    <line x1="17" y1="132" x2="63" y2="178"/>
+    <line x1="17" y1="178" x2="63" y2="132"/>
+    <!-- Spokes bride wheel right -->
+    <line x1="120" y1="123" x2="120" y2="187"/>
+    <line x1="88" y1="155" x2="152" y2="155"/>
+    <line x1="97" y1="132" x2="143" y2="178"/>
+    <line x1="97" y1="178" x2="143" y2="132"/>
+    <!-- Frame -->
+    <line x1="80" y1="105" x2="40" y2="155"/>
+    <line x1="80" y1="105" x2="120" y2="155"/>
+    <line x1="80" y1="105" x2="60" y2="105"/>
+    <line x1="60" y1="105" x2="40" y2="155"/>
+    <!-- Seat post -->
+    <line x1="70" y1="90" x2="80" y2="105"/>
+    <line x1="62" y1="88" x2="78" y2="88"/>
+    <!-- Handlebar post -->
+    <line x1="100" y1="95" x2="120" y2="105"/>
+    <line x1="95" y1="88" x2="108" y2="88"/>
+    <!-- Chain ring -->
+    <circle cx="80" cy="140" r="14" stroke-width="1.5"/>
+    <circle cx="80" cy="140" r="5"/>
+  </g>
+  <!-- Rider silhouette -->
+  <g fill="#D4813A" opacity="0.85">
+    <!-- Head -->
+    <circle cx="108" cy="58" r="13"/>
+    <!-- Hair / veil suggestion -->
+    <ellipse cx="108" cy="52" rx="13" ry="7" opacity="0.6"/>
+    <!-- Body torso -->
+    <ellipse cx="98" cy="80" rx="10" ry="18"/>
+    <!-- Dress skirt flare -->
+    <ellipse cx="90" cy="102" rx="14" ry="9"/>
+    <!-- Arms -->
+    <path d="M102 72 Q112 75 116 85" stroke="#D4813A" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- Legs -->
+    <path d="M90 110 Q85 125 82 140" stroke="#D4813A" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M92 110 Q95 125 98 138" stroke="#D4813A" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- Label -->
+  <text x="80" y="196" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="11" fill="#2D6A7A" opacity="0.7">Sarah</text>
+</svg>
