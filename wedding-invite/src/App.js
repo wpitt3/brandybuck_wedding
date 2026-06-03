@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 import { PALETTES, FONT_PAIRINGS, buildTheme, DEFAULT_TWEAKS } from './theme';
+import { useSplitforms } from './useSplitforms';
 
 const COUPLE = { bride: 'Helen', groom: 'William' };
 const WEDDING_DATE = new Date('2026-09-26T15:30:00');
@@ -81,18 +82,17 @@ const RiverDivider = ({ flip = false }) => (
 
 // ─── Data ─────────────────────────────────────────────────────
 const SCHEDULE = [
-  { time: '2:00 PM', label: 'Guests Arrive',          note: 'Welcome drinks on the riverside terrace', km: '0.0' },
-  { time: '2:30 PM', label: 'Ceremony Begins',         note: 'Please be seated by 2:20 PM',            km: '0.8' },
-  { time: '3:15 PM', label: 'Drinks Reception',        note: 'Lawn games & canapés by the water',      km: '3.2' },
-  { time: '5:00 PM', label: 'Wedding Breakfast',       note: 'Seated dinner in the main hall',         km: '6.1' },
-  { time: '7:30 PM', label: 'Speeches & Cake',         note: 'Toast with Bristol cider',               km: '9.4' },
-  { time: '8:00 PM', label: 'Evening Celebrations',    note: 'Live music & dancing',                   km: '11.0' },
-  { time: '12:00 AM', label: 'Carriages',              note: 'Safe travels home',                      km: '12.0' },
+  { time: '3:30 PM', label: 'Guests Arrive',           note: 'Welcome drinks on the riverside terrace', km: '0.0' },
+  { time: '4:00 PM', label: 'Ceremony Begins',         note: 'Please be seated by 2:20 PM',            km: '0.8' },
+  { time: '4:30 PM', label: 'Drinks Reception',        note: 'Easy Board and Casual games',      km: '3.2' },
+  { time: '6:00 PM', label: 'Dinner & Speeches',       note: 'Seated dinner',         km: '6.1' },
+  { time: '8:00 PM', label: 'Cake and Drinks',         note: 'Back outside whilst the setup the room for dancing',               km: '9.4' },
+  { time: '8:30 PM', label: 'Soul Strutters',    note: 'Live music & dancing',                   km: '11.0' },
+  { time: '12:00 AM', label: 'End of Evening',              note: 'Safe travels home',                      km: '12.0' },
 ];
 
 const DIETARY_OPTIONS = [
-  'No requirements','Vegetarian','Vegan','Gluten-free',
-  'Dairy-free','Nut allergy','Halal','Kosher','Other (please specify)',
+  'No requirements', 'Vegan','Gluten-free', 'Dairy-free', 'Nut allergy', 'Coconut allergy', 'Halal', 'Kosher','Other (please specify)',
 ];
 
 // ─── Theme Editor Panel ───────────────────────────────────────
@@ -281,8 +281,25 @@ export default function App() {
   const [fontPairing, setFontPairing] = useState(FONT_PAIRINGS[0]);
   const [tweaks,      setTweaks]      = useState(DEFAULT_TWEAKS);
   const [editorOpen,  setEditorOpen]  = useState(false);
-  const [form,        setForm]        = useState({ name:'', guests:'1', dietary:'', other:'', attending:null, message:'' });
+  const { submit: submitRsvp, status: submitStatus } = useSplitforms();
+  const [attending,   setAttending]   = useState(null);
+  const [guests,      setGuests]      = useState([{ id: 1, name: '', dietary: '', other: '' }]);
+  const [message,     setMessage]     = useState('');
   const [submitted,   setSubmitted]   = useState(false);
+  const nextId = useRef(2);
+
+  const updateGuest = (id, field, val) =>
+      setGuests(gs => gs.map(g => g.id === id ? { ...g, [field]: val } : g));
+
+  const addGuest = () => {
+    setGuests(gs => [...gs, { id: nextId.current++, name: '', dietary: '', other: '' }]);
+  };
+
+  const removeGuest = (id) => {
+    setGuests(gs => gs.length > 1 ? gs.filter(g => g.id !== id) : gs);
+  };
+
+  const canSubmit = attending !== null && guests.every(g => g.name.trim());
   const [scrolled,    setScrolled]    = useState(false);
   const [navOpen,     setNavOpen]     = useState(false);
   const countdown = useCountdown(WEDDING_DATE);
@@ -399,7 +416,6 @@ export default function App() {
       {/* ── DETAILS (Bristol route strip) ── */}
       <div id="details" className="details-wrapper">
         <Section className="details-section">
-          <p className="eyebrow">Route Information</p>
           <h2 className="section-title">The Details</h2>
 
           <div className="detail-rows">
@@ -449,7 +465,7 @@ export default function App() {
         {/*<div className="sched-sprig-l"><Sprig className="sprig" /></div>*/}
         {/*<div className="sched-sprig-r"><Sprig className="sprig sprig-flip" /></div>*/}
         <Section className="schedule-section">
-          <p className="eyebrow eyebrow-light">Ride Schedule</p>
+          {/*<p className="eyebrow eyebrow-light">Ride Schedule</p>*/}
           <h2 className="section-title section-title-light">Order of the Day</h2>
           <div className="timeline">
             {SCHEDULE.map((item, i) => (
@@ -480,66 +496,117 @@ export default function App() {
       {/* ── RSVP (Nature) ── */}
       <div id="rsvp" className="rsvp-wrapper">
         <Section className="rsvp-section">
-          <p className="eyebrow">Sign the Guest Book</p>
+          {/*<p className="eyebrow">Sign the Guest Book</p>*/}
           <h2 className="section-title">RSVP</h2>
-          <p className="section-sub">Please respond by <strong>1st August 2026</strong></p>
+          <p className="section-sub">Please respond as soon as you can</p>
 
           {submitted ? (
-            <div className="success">
-              {/*<WheelDeco size={56} className="success-wheel" />*/}
-              <h3>Thanks, {form.name}!</h3>
-              <p>{form.attending === 'yes'
-                ? "You're on the list — see you on the waterfront!"
-                : "We'll miss you — thanks for letting us know."}</p>
-            </div>
+              <div className="success">
+                <h3>Thanks{attending === 'yes' && guests[0].name ? `, ${guests[0].name}` : ''}!</h3>
+                <p>{attending === 'yes'
+                    ? `We can't wait to celebrate with ${guests.length > 1 ? 'you all' : 'you'} — see you on the waterfront!`
+                    : "We'll miss you — thanks for letting us know."}</p>
+              </div>
           ) : (
-            <form className="form" onSubmit={e => { e.preventDefault(); setSubmitted(true); }}>
-              <div className="fg">
-                <label>Full name *</label>
-                <input type="text" required placeholder="e.g. Alex Morgan"
-                  value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
-              </div>
-              <div className="fg">
-                <label>Will you be joining the ride? *</label>
-                <div className="toggle-row">
-                  {[['yes',"Absolutely, I'm in!"],['no',"Can't make it this time"]].map(([v,l]) => (
-                    <button key={v} type="button"
-                      className={`toggle ${form.attending === v ? 'on' : ''}`}
-                      onClick={() => setForm({...form, attending: v})}>{l}</button>
-                  ))}
-                </div>
-              </div>
-              {form.attending === 'yes' && (<>
+              <form className="form" onSubmit={async e => {
+                e.preventDefault();
+                const ok = await submitRsvp({ attending, guests, message });
+                if (ok) setSubmitted(true);
+              }}>
+
+                {/* ── Attending question ── */}
                 <div className="fg">
-                  <label>Number of guests (including yourself)</label>
-                  <select value={form.guests} onChange={e => setForm({...form, guests: e.target.value})}>
-                    {[1,2,3,4].map(n => <option key={n} value={n}>{n} {n===1?'guest':'guests'}</option>)}
-                  </select>
-                </div>
-                <div className="fg">
-                  <label>Dietary requirements</label>
-                  <select value={form.dietary} onChange={e => setForm({...form, dietary: e.target.value})}>
-                    <option value="">Please select…</option>
-                    {DIETARY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                  </select>
-                </div>
-                {form.dietary === 'Other (please specify)' && (
-                  <div className="fg">
-                    <label>Please give details</label>
-                    <input type="text" placeholder="Tell us about your needs…"
-                      value={form.other} onChange={e => setForm({...form, other: e.target.value})} />
+                  <label>Will you be joining? *</label>
+                  <div className="toggle-row">
+                    {[['yes',"Absolutely, We're in!"],['no',"Can't make it"]].map(([v,l]) => (
+                        <button key={v} type="button"
+                                className={`toggle ${attending === v ? 'on' : ''}`}
+                                onClick={() => setAttending(v)}>{l}</button>
+                    ))}
                   </div>
+                </div>
+
+                {/* ── Guest list (only if attending) ── */}
+                {(attending === 'yes' || attending === 'no') && (
+                    <div className="guest-list">
+                      <div className="guest-list-header">
+                        <span className="guest-list-label">Your party</span>
+                        <span className="guest-count">{guests.length} {guests.length === 1 ? 'guest' : 'guests'}</span>
+                      </div>
+
+                      {guests.map((guest, idx) => (
+                          <div key={guest.id} className="guest-card">
+                            <div className="guest-card-header">
+                              <span className="guest-num">Guest {idx + 1}</span>
+                              {guests.length > 1 && (
+                                  <button type="button" className="guest-remove" onClick={() => removeGuest(guest.id)} aria-label="Remove guest">
+                                    ✕
+                                  </button>
+                              )}
+                            </div>
+
+                            <div className="fg">
+                              {/*<label>Full name *</label>*/}
+                              <input
+                                  type="text"
+                                  required
+                                  placeholder={idx === 0 ? 'Your name' : 'Guest name'}
+                                  value={guest.name}
+                                  onChange={e => updateGuest(guest.id, 'name', e.target.value)}
+                              />
+                            </div>
+                            {attending === 'yes' && (
+                              <div className="fg">
+                                <label>Dietary requirements (Event is meat free)</label>
+                                <select
+                                    value={guest.dietary}
+                                    onChange={e => updateGuest(guest.id, 'dietary', e.target.value)}
+                                >
+                                  <option value="">Please select…</option>
+                                  {DIETARY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                                </select>
+                              </div>
+                            )}
+
+                            {guest.dietary === 'Other (please specify)' && (
+                                <div className="fg">
+                                  <label>Please give details</label>
+                                  <input
+                                      type="text"
+                                      placeholder="Tell us about their needs…"
+                                      value={guest.other}
+                                      onChange={e => updateGuest(guest.id, 'other', e.target.value)}
+                                  />
+                                </div>
+                            )}
+                          </div>
+                      ))}
+
+                      <button type="button" className="add-guest-btn" onClick={addGuest}>
+                        <span className="add-guest-icon">+</span>
+                        Add another guest
+                      </button>
+                    </div>
                 )}
-              </>)}
-              <div className="fg">
-                <label>Message to Sarah &amp; James</label>
-                <textarea rows={4} placeholder="Share your well wishes…"
-                  value={form.message} onChange={e => setForm({...form, message: e.target.value})} />
-              </div>
-              <button type="submit" className="submit" disabled={!form.name || !form.attending}>
-                Send RSVP
-              </button>
-            </form>
+
+                {/* ── Message ── */}
+                {attending !== null && (
+                    <div className="fg">
+                      <label>Message to Helen &amp; Will</label>
+                      <textarea rows={4} placeholder="Share your well wishes…"
+                                value={message} onChange={e => setMessage(e.target.value)} />
+                    </div>
+                )}
+
+                <div className="submit-wrap">
+                  <button type="submit" className="submit" disabled={!canSubmit || submitStatus === 'sending'}>
+                    {submitStatus === 'sending' ? 'Sending…' : 'Send RSVP'}
+                  </button>
+                  {submitStatus === 'error' && (
+                      <p className="submit-error">Something went wrong — please try again.</p>
+                  )}
+                </div>
+              </form>
           )}
         </Section>
       </div>

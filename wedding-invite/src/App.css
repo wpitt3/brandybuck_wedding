@@ -283,7 +283,7 @@ body {
 }
 .dr-body { padding-left: 1rem; }
 .dr-body h3 {
-  font-family: var(--font-body); font-size: 0.6rem; font-weight: 500;
+  font-family: var(--font-body); font-size: 0.8rem; font-weight: 600;
   letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--primary-muted); margin-bottom: 0.5rem;
 }
@@ -370,7 +370,7 @@ body {
 
 /* ── RSVP ── */
 .rsvp-wrapper {
-  background: color-mix(in srgb, var(--bg) 70%, var(--primary-faint));
+  background: var(--bg);
   transition: background 0.5s;
 }
 .form { display: flex; flex-direction: column; gap: 2rem; max-width: 520px; margin: 0 auto; }
@@ -381,7 +381,7 @@ body {
   color: color-mix(in srgb, var(--primary) 70%, var(--accent));
 }
 .fg input, .fg select, .fg textarea {
-  font-family: var(--font-body); font-size: 0.95rem; color: var(--primary-dark);
+  font-family: var(--font-body); font-size: 0.95rem; color: var(--primary);
   background: transparent;
   border: none; border-bottom: 1.5px solid color-mix(in srgb, var(--primary) 22%, transparent);
   padding: 0.7rem 0; outline: none; transition: border-color 0.3s, font-family 0.4s;
@@ -396,11 +396,11 @@ body {
   font-family: var(--font-body); font-size: 0.68rem; font-weight: 500;
   padding: 0.75rem 1.4rem;
   border: 1.5px solid color-mix(in srgb, var(--primary) 22%, transparent);
-  background: transparent; cursor: pointer; color: var(--primary-muted);
+  background: transparent; cursor: pointer; color: var(--muted);
   transition: all 0.25s; border-radius: 2px;
 }
 .toggle:hover { border-color: var(--accent); color: var(--accent); }
-.toggle.on { background: var(--primary); color: var(--on-primary); border-color: var(--primary-dark); }
+.toggle.on { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
 .submit {
   font-family: var(--font-display); font-size: 1rem; letter-spacing: 0.12em;
   color: var(--on-primary); background: var(--primary);
@@ -415,9 +415,9 @@ body {
   animation: rideIn 0.8s var(--ease) both;
   display: flex; flex-direction: column; align-items: center; gap: 1.25rem;
 }
-.success-wheel { color: var(--primary-dark); animation: slowSpin 6s linear infinite; }
-.success h3 { font-family: var(--font-display); font-size: 2rem; color: var(--primary-dark); }
-.success p { font-family: var(--font-body); color: var(--primary-muted); line-height: 1.7; }
+.success-wheel { color: var(--primary); animation: slowSpin 6s linear infinite; }
+.success h3 { font-family: var(--font-display); font-size: 2rem; color: var(--primary); }
+.success p { font-family: var(--font-body); color: var(--muted); line-height: 1.7; }
 
 /* ── Footer ── */
 .footer {
@@ -551,6 +551,113 @@ body {
   color: var(--primary-muted); margin-top: 1px;
 }
 .font-check { font-size: 0.7rem; color: var(--accent); font-weight: 700; }
+
+
+/* ── Guest List ── */
+.guest-list {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1.5px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  border-radius: 4px; overflow: hidden;
+}
+
+.guest-list-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  border-bottom: 1.5px solid color-mix(in srgb, var(--primary) 12%, transparent);
+}
+.guest-list-label {
+  font-family: var(--font-body); font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);
+}
+.guest-count {
+  font-family: var(--font-body); font-size: 0.72rem; font-weight: 500;
+  color: var(--accent); letter-spacing: 0.05em;
+  transition: color 0.3s;
+}
+
+.guest-card {
+  padding: 1.5rem 1.25rem;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--primary) 10%, transparent);
+  display: flex; flex-direction: column; gap: 1.25rem;
+  animation: guestSlideIn 0.3s var(--ease) both;
+}
+@keyframes guestSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.guest-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.guest-num {
+  font-family: var(--font-body); font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--primary);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.guest-num::before {
+  content: '';
+  display: inline-block; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--primary); color: var(--on-primary);
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0;
+  text-transform: none; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+/* override ::before per index via counter */
+.guest-card:nth-child(2) .guest-num::before { content: '1'; }
+.guest-card:nth-child(3) .guest-num::before { content: '2'; }
+.guest-card:nth-child(4) .guest-num::before { content: '3'; }
+.guest-card:nth-child(5) .guest-num::before { content: '4'; }
+.guest-card:nth-child(6) .guest-num::before { content: '5'; }
+.guest-card:nth-child(7) .guest-num::before { content: '6'; }
+
+.guest-remove {
+  background: none; border: none; cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--muted);
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+}
+.guest-remove:hover {
+  background: color-mix(in srgb, red 12%, transparent);
+  color: #c0392b;
+}
+
+/* nested .fg inside guest-card — remove bottom border, tighter spacing */
+.guest-card .fg { gap: 0.35rem; }
+.guest-card .fg input,
+.guest-card .fg select,
+.guest-card .fg textarea {
+  border-bottom-color: color-mix(in srgb, var(--primary) 15%, transparent);
+  padding: 0.55rem 0;
+  font-size: 0.9rem;
+}
+
+.add-guest-btn {
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  width: 100%; padding: 1rem;
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-body); font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent);
+  transition: background 0.2s, color 0.2s;
+}
+.add-guest-btn:hover {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.add-guest-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  font-size: 1rem; line-height: 1;
+  transition: background 0.2s, color 0.2s;
+}
+.add-guest-btn:hover .add-guest-icon {
+  background: var(--accent); color: var(--bg);
+}
 
 /* Current theme swatches */
 .current-swatches { display: flex; flex-direction: column; gap: 0.6rem; }

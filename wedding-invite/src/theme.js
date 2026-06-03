@@ -7,6 +7,11 @@
 
 export const PALETTES = [
   {
+    id: 'harbourside',
+    name: 'Harbourside',
+    colors: ["#b46a61","#e57b62","#f6c324","#7093b1",],
+  },
+  {
     id: 'avon',
     name: 'Avon Blue',
     colors: ["#fc8a10","#17b3d9","#edf1f4","#e2c1de"],
@@ -16,11 +21,7 @@ export const PALETTES = [
     name: 'Avon Gorge',
     colors: ["#cb674c","#6c95b0","#dbd7d3","#595421"],
   },
-  {
-    id: 'harbourside',
-    name: 'Harbourside',
-    colors: ["#b46a61","#e57b62","#f6c324","#7093b1",],
-  },
+
   {
     id: 'suspension',
     name: 'Suspension Bridge',
@@ -107,6 +108,27 @@ export const FONT_PAIRINGS = [
     display: 'IM Fell English',
     body: 'Libre Baskerville',
     googleFonts: 'IM+Fell+English:ital@0;1&family=Libre+Baskerville:wght@400;700',
+  },
+  {
+    id: 'literary',
+    name: 'Literary',
+    display: 'IM Fell English',
+    body: 'Libre Baskerville',
+    googleFonts: 'IM+Fell+English:ital@0;1&family=Libre+Baskerville:wght@400;700',
+  },
+  {
+    id: 'sacramento',
+    name: 'Sacramento',
+    display: 'Sacramento',
+    body: 'Montserrat',
+    googleFonts: 'Sacramento&family=Montserrat:wght@300;400;500',
+  },
+  {
+    id: 'yellowtail',
+    name: 'Yellowtail',
+    display: 'Yellowtail',
+    body: 'Open Sans',
+    googleFonts: 'Yellowtail&family=Open+Sans:wght@700;800',
   },
 ];
 
