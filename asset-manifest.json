@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/brandybuck_wedding/static/css/main.fa50f31b.css",
-    "main.js": "/brandybuck_wedding/static/js/main.03a9ef56.js",
+    "main.css": "/brandybuck_wedding/static/css/main.1714e36f.css",
+    "main.js": "/brandybuck_wedding/static/js/main.65f334e4.js",
     "index.html": "/brandybuck_wedding/index.html",
-    "main.fa50f31b.css.map": "/brandybuck_wedding/static/css/main.fa50f31b.css.map",
-    "main.03a9ef56.js.map": "/brandybuck_wedding/static/js/main.03a9ef56.js.map"
+    "main.1714e36f.css.map": "/brandybuck_wedding/static/css/main.1714e36f.css.map",
+    "main.65f334e4.js.map": "/brandybuck_wedding/static/js/main.65f334e4.js.map"
   },
   "entrypoints": [
-    "static/css/main.fa50f31b.css",
-    "static/js/main.03a9ef56.js"
+    "static/css/main.1714e36f.css",
+    "static/js/main.65f334e4.js"
   ]
 }
